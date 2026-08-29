@@ -1,0 +1,23 @@
+{
+  "name": "codex-paper-reader",
+  "version": "0.6.2",
+  "private": true,
+  "type": "module",
+  "description": "A local-first Chrome extension that opens a PDF-bound GPT research-paper reader in an independent tab.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManagerYu10/codex-paper-reader.git"
+  },
+  "homepage": "https://github.com/ManagerYu10/codex-paper-reader#readme",
+  "bugs": "https://github.com/ManagerYu10/codex-paper-reader/issues",
+  "scripts": {
+    "start": "node server/server.js",
+    "check": "node scripts/check.mjs",
+    "test": "node --test server/test/*.test.js extension/test/*.test.js",
+    "package:extension": "node scripts/package-extension.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
