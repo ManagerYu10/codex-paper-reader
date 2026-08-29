@@ -101,3 +101,9 @@ arXiv / PDF 的“GPT 导读”入口
 ## License
 
 [MIT](LICENSE)
+
+## 论文事实幻觉评测
+
+仓库包含一套面向论文导读的原子事实评测工具，可比较 GPT、DeepSeek 和豆包产品输出，并分别报告事实幻觉、数字错误、无依据编造、引用准确率和关键事实覆盖率。参见 [evaluation/README.md](evaluation/README.md)。
+
+首轮 EditProbe 试跑已经完成，见 [评测报告](evaluation/results/EDITPROBE_PILOT_2026-08-29.md)。结果包含六档 API 模型、豆包真实输出、双裁判分歧和人工确认的错误下界。

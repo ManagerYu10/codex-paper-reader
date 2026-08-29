@@ -15,7 +15,10 @@
     "start": "node server/server.js",
     "check": "node scripts/check.mjs",
     "test": "node --test server/test/*.test.js extension/test/*.test.js",
-    "package:extension": "node scripts/package-extension.mjs"
+    "package:extension": "node scripts/package-extension.mjs",
+    "eval:run": "node evaluation/scripts/run.mjs",
+    "eval:judge": "node evaluation/scripts/evaluate.mjs",
+    "eval:report": "node evaluation/scripts/report.mjs"
   },
   "engines": {
     "node": ">=20"

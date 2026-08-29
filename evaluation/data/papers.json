@@ -1,0 +1,86 @@
+[
+  {
+    "id": "editprobe-2603.19775",
+    "arxiv_id": "2603.19775",
+    "title": "Evaluating Image Editing with LLMs: A Comprehensive Benchmark and Intermediate-Layer Probing Approach",
+    "pdf_url": "https://arxiv.org/pdf/2603.19775",
+    "text_path": "evaluation/cache/2603.19775.txt",
+    "gold_status": "human-checked-v1",
+    "key_facts": [
+      {
+        "id": "dataset-scale",
+        "fact": "TIEdit has 512 source images, eight editing tasks, ten editing models, and 5,120 edited images.",
+        "evidence": "pp. 1–2, Fig. 1 and Sec. III-B"
+      },
+      {
+        "id": "annotation-scale",
+        "fact": "Twenty expert annotators produced 307,200 raw ratings, which were aggregated into 15,360 MOS values.",
+        "evidence": "pp. 1–2, Fig. 1"
+      },
+      {
+        "id": "dimensions",
+        "fact": "The three human-rating dimensions are perceptual quality, editing alignment, and content preservation; the overall MOS is their average.",
+        "evidence": "Sec. III-C, Eqs. 1–2"
+      },
+      {
+        "id": "four-independent-tasks",
+        "fact": "Perceptual quality, editing alignment, content preservation, and overall score are modeled as four independent regression tasks and trained separately.",
+        "evidence": "Sec. IV, opening paragraph"
+      },
+      {
+        "id": "backbone",
+        "fact": "EditProbe uses InternVL3 as its MLLM backbone.",
+        "evidence": "Sec. V-A, Implementation details"
+      },
+      {
+        "id": "stage-one",
+        "fact": "Stage 1 is an offline analysis on the frozen backbone that combines normalized KL divergence, layer discriminability ratio, and information entropy into a saliency score to select an intermediate layer.",
+        "evidence": "Sec. IV-B, Eqs. 10–11"
+      },
+      {
+        "id": "stage-two-feature",
+        "fact": "Stage 2 averages the selected-layer final-token hidden states of the source-image and edited-image streams to form z(x).",
+        "evidence": "Sec. IV-C, Eq. 12"
+      },
+      {
+        "id": "regressor",
+        "fact": "The score head is a two-hidden-layer MLP with ReLU activations trained using MSE.",
+        "evidence": "Sec. IV-C, Eqs. 13–14"
+      },
+      {
+        "id": "adalora",
+        "fact": "AdaLoRA modules are inserted into both the vision encoder and language model; only AdaLoRA parameters and the regression head are updated, while the original backbone stays frozen.",
+        "evidence": "Sec. IV-D"
+      },
+      {
+        "id": "training",
+        "fact": "Training uses AdaLoRA rank 16, scale 32, dropout 0.05, 448×448 images, AdamW at 1e-5 with cosine decay and warm-up, batch size 8, and five epochs on a 40GB NVIDIA RTX A100.",
+        "evidence": "Sec. V-A, Training settings"
+      }
+    ]
+  },
+  {
+    "id": "dice-2505.20405",
+    "arxiv_id": "2505.20405",
+    "title": "What Changed? Detecting and Evaluating Instruction-Guided Image Edits with Multimodal Large Language Models",
+    "pdf_url": "https://arxiv.org/pdf/2505.20405",
+    "text_path": "evaluation/cache/2505.20405.txt",
+    "gold_status": "pending"
+  },
+  {
+    "id": "gie-bench-2505.11493",
+    "arxiv_id": "2505.11493",
+    "title": "GIE-Bench: Towards Grounded Evaluation for Text-Guided Image Editing",
+    "pdf_url": "https://arxiv.org/pdf/2505.11493",
+    "text_path": "evaluation/cache/2505.11493.txt",
+    "gold_status": "pending"
+  },
+  {
+    "id": "lmm4edit-2507.16193",
+    "arxiv_id": "2507.16193",
+    "title": "LMM4Edit: Benchmarking and Evaluating Multimodal Image Editing with LMMs",
+    "pdf_url": "https://arxiv.org/pdf/2507.16193",
+    "text_path": "evaluation/cache/2507.16193.txt",
+    "gold_status": "pending"
+  }
+]

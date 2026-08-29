@@ -3,3 +3,5 @@ dist/
 *.zip
 .DS_Store
 node_modules/
+evaluation/cache/
+evaluation/runs/
