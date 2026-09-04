@@ -5,3 +5,6 @@ dist/
 node_modules/
 evaluation/cache/
 evaluation/runs/
+
+# 下载过的 PDF 缓存
+.cache/

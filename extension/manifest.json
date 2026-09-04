@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Codex 论文阅读器",
-  "description": "从 arXiv 或 PDF 一键打开独立的 GPT 论文导读网页，自动总结并支持追问。",
-  "version": "0.6.2",
+  "name": "DeepSeek 论文阅读器",
+  "description": "从 arXiv 或 PDF 一键打开独立的论文导读网页：本地抽全文 + 图表页原图，DeepSeek 多模态解读。",
+  "version": "0.7.5",
   "minimum_chrome_version": "116",
   "permissions": [
     "tabs",
@@ -18,13 +18,17 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["entry.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "entry.js"
+      ],
       "run_at": "document_idle"
     }
   ],
   "action": {
-    "default_title": "GPT 导读：打开当前 PDF"
+    "default_title": "论文导读：打开当前 PDF"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-src 'self' http: https: file: blob:"

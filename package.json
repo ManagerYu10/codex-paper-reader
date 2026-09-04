@@ -1,9 +1,9 @@
 {
   "name": "codex-paper-reader",
-  "version": "0.6.2",
+  "version": "0.7.5",
   "private": true,
   "type": "module",
-  "description": "A local-first Chrome extension that opens a PDF-bound GPT research-paper reader in an independent tab.",
+  "description": "A local-first Chrome extension that opens a PDF-bound DeepSeek research-paper reader in an independent tab.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,7 +18,8 @@
     "package:extension": "node scripts/package-extension.mjs",
     "eval:run": "node evaluation/scripts/run.mjs",
     "eval:judge": "node evaluation/scripts/evaluate.mjs",
-    "eval:report": "node evaluation/scripts/report.mjs"
+    "eval:report": "node evaluation/scripts/report.mjs",
+    "sync:prompt": "node scripts/sync-prompt.mjs"
   },
   "engines": {
     "node": ">=20"

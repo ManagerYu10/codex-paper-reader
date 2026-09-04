@@ -204,6 +204,19 @@ button { color: inherit; }
 .status-error { color: var(--danger); }
 .status-error i { background: var(--danger); }
 
+/* 解析实据：让用户一眼看到模型到底收到了多少内容 */
+.doc-facts {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: default;
+}
+
 .text-button {
   flex: 0 0 auto;
   padding: 5px 7px;
@@ -456,6 +469,18 @@ button { color: inherit; }
 }
 .send-button:hover { background: var(--accent-deep); }
 .send-button:disabled { background: #bbbdb7; cursor: wait; }
+.stop-button {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--danger, #b3453f);
+  cursor: pointer;
+}
+.stop-button:hover { filter: brightness(.92); }
+.stop-button svg { width: 15px; height: 15px; fill: #fff; }
 .send-button svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; }
 .disclaimer { margin: 5px 0 0; color: #999b94; text-align: center; font-size: 9px; }
 
@@ -509,6 +534,25 @@ button { color: inherit; }
 }
 .primary-button { background: var(--accent); color: #fff; }
 .secondary-button { background: transparent; color: var(--accent); }
+.settings-static {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+.settings-static span { color: var(--muted); font-size: 10px; font-weight: 700; }
+.settings-static strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+.settings-static em { color: var(--muted); font-size: 10px; font-style: normal; }
+.empty-state .secondary-button {
+  margin-top: 10px;
+  padding: 7px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
 .connection-result { padding: 9px 10px; border-radius: 8px; background: var(--surface-soft); color: var(--muted); font-size: 10px; line-height: 1.5; }
 .connection-result.ok { background: var(--accent-soft); color: var(--accent-deep); }
 .connection-result.error { background: #f6e2e2; color: var(--danger); }

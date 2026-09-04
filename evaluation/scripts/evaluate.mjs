@@ -264,7 +264,7 @@ async function runPool(items, concurrency, worker) {
 
 function parseArgs(values) {
   const parsed = {
-    env: "/Users/yuzhang/ZhangYu/BaseModel/.env",
+    env: "/Users/yuzhang/ZhangYu/.env",
     paper: "editprobe-2603.19775"
   };
   for (let index = 0; index < values.length; index += 1) {

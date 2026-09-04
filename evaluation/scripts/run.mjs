@@ -72,7 +72,7 @@ console.log(`output=${outputDir}`);
 
 function parseArgs(values) {
   const parsed = {
-    env: "/Users/yuzhang/ZhangYu/BaseModel/.env",
+    env: "/Users/yuzhang/ZhangYu/.env",
     paper: "editprobe-2603.19775",
     concurrency: "2"
   };

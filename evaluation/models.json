@@ -50,5 +50,14 @@
     "max_tokens": 16000,
     "base_url_env": "DEEPSEEK_BASE_URL",
     "api_key_env": "DEEPSEEK_API_KEY"
+  },
+  {
+    "id": "deepseek-v4-flash-vision-none",
+    "provider": "chat-completions",
+    "model": "deepseek-v4-flash-vision-exp",
+    "thinking": "disabled",
+    "reasoning_effort": "low",
+    "base_url_env": "DEEPSEEK_BASE_URL",
+    "api_key_env": "DEEPSEEK_API_KEY"
   }
 ]

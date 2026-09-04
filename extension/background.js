@@ -6,7 +6,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== "OPEN_READER") return false;
-  const title = cleanTitle(message.title || sender.tab?.title || "未命名论文");
+  const title = cleanTitle(message.title || sender.tab?.title || "", message.pdfUrl);
   openReader(message.pdfUrl, title)
     .then(() => sendResponse({ ok: true }))
     .catch((error) => sendResponse({ ok: false, error: error.message }));
@@ -19,7 +19,7 @@ async function openReaderFromTab(tab) {
     await flashActionError(tab?.id);
     return;
   }
-  await openReader(pdfUrl, cleanTitle(tab?.title || filenameFromUrl(pdfUrl)));
+  await openReader(pdfUrl, cleanTitle(tab?.title || "", pdfUrl));
 }
 
 async function openReader(rawPdfUrl, title) {
@@ -67,19 +67,39 @@ async function flashActionError(tabId) {
   setTimeout(() => chrome.action.setBadgeText({ tabId, text: "" }).catch(() => {}), 2200);
 }
 
-function cleanTitle(title) {
-  return String(title)
+const PLACEHOLDER_TITLE = "未命名论文";
+
+function cleanTitle(title, fallbackUrl) {
+  const cleaned = String(title || "")
     .replace(/^\s*Title:\s*/i, "")
     .replace(/\s*[-|]\s*(Google Chrome|Microsoft Edge)$/i, "")
     .replace(/\.pdf$/i, "")
     .trim()
-    .slice(0, 180) || "未命名论文";
+    .slice(0, 180);
+  // 没刷新的旧 content script 仍会发来字面量占位符，它是 truthy，
+  // 会顶掉后面更好的兜底，所以在这里就当成没给。
+  // 标题只是初始占位；论文真正的标题由本地 PyMuPDF 抽出后再覆盖。
+  if (!cleaned || cleaned === PLACEHOLDER_TITLE) return filenameFromUrl(fallbackUrl);
+  return cleaned;
 }
 
 function filenameFromUrl(rawUrl) {
   try {
-    return decodeURIComponent(new URL(rawUrl).pathname.split("/").pop() || "未命名论文").replace(/\.pdf$/i, "");
+    const parsed = new URL(rawUrl);
+    const arxiv = parsed.pathname.match(/\/(?:pdf|abs|html)\/([^/]+?)(?:\.pdf)?\/?$/i);
+    if (arxiv && /(^|\.)arxiv\.org$/i.test(parsed.hostname)) return `arXiv ${arxiv[1]}`;
+    const name = decodeURIComponent(parsed.pathname.split("/").filter(Boolean).pop() || "")
+      .replace(/\.pdf$/i, "");
+    // openreview 这类把论文 id 放在查询串里，路径末段只是个 "pdf"，没有信息量
+    if (!name || /^(pdf|download|view|file|paper)$/i.test(name)) {
+      for (const key of ["id", "doi", "arxivId", "paperId"]) {
+        const value = parsed.searchParams.get(key);
+        if (value) return `${parsed.hostname} ${value}`.slice(0, 180);
+      }
+      return parsed.hostname || PLACEHOLDER_TITLE;
+    }
+    return name;
   } catch {
-    return "未命名论文";
+    return PLACEHOLDER_TITLE;
   }
 }

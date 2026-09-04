@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GPT 论文导读</title>
+    <title>DeepSeek 论文导读</title>
     <link rel="stylesheet" href="sidepanel.css" />
   </head>
   <body>
@@ -11,9 +11,9 @@
       <section class="pdf-workspace" aria-label="论文 PDF">
         <header class="pdf-toolbar">
           <div class="pdf-brand">
-            <span class="pdf-brand-mark">G</span>
+            <span class="pdf-brand-mark">D</span>
             <div>
-              <p class="eyebrow">GPT PAPER READER</p>
+              <p class="eyebrow">DEEPSEEK PAPER READER</p>
               <h1 id="pdf-title">正在打开论文</h1>
             </div>
           </div>
@@ -21,17 +21,17 @@
         </header>
         <div id="pdf-empty" class="pdf-empty" hidden>
           <strong>没有绑定 PDF</strong>
-          <span>请从 arXiv 的“GPT 导读”按钮、PDF 页面或扩展图标重新打开。</span>
+          <span>请从 arXiv 的“论文导读”按钮、PDF 页面或扩展图标重新打开。</span>
         </div>
         <iframe id="pdf-frame" class="pdf-frame" title="当前论文 PDF"></iframe>
       </section>
 
-      <aside class="assistant-workspace" aria-label="GPT 论文导读与对话">
+      <aside class="assistant-workspace" aria-label="论文导读与对话">
         <div class="app-shell">
           <header class="topbar">
-            <div class="brand-mark" aria-hidden="true">G</div>
+            <div class="brand-mark" aria-hidden="true">D</div>
             <div class="paper-heading">
-              <p class="eyebrow">GPT 导读</p>
+              <p class="eyebrow">论文导读</p>
               <h1 id="paper-title">等待打开论文</h1>
             </div>
             <button id="settings-button" class="icon-button" type="button" aria-label="设置" title="设置">
@@ -41,6 +41,7 @@
 
           <div class="statusbar">
             <span id="document-status" class="status-pill status-neutral"><i></i>正在读取固定 PDF</span>
+            <span id="doc-facts" class="doc-facts" hidden></span>
             <button id="new-session-button" class="text-button" type="button">重新总结</button>
           </div>
 
@@ -52,21 +53,23 @@
             </div>
             <h2 id="empty-title">没有找到 PDF</h2>
             <p id="empty-copy">请关闭本页，然后从 PDF 页面点击扩展图标重新打开。</p>
+            <button id="pick-file-button" class="secondary-button" type="button">改为选择本地 PDF</button>
+            <input id="file-picker" type="file" accept="application/pdf,.pdf" hidden />
           </section>
 
           <section id="welcome-state" class="welcome-state" hidden>
             <div class="auto-reader-mark" aria-hidden="true">
-              <span class="auto-reader-core">G</span>
+              <span class="auto-reader-core">D</span>
               <span class="auto-reader-orbit"></span>
             </div>
             <div class="welcome-copy">
               <span class="section-kicker">自动论文导读</span>
               <h2>正在阅读整篇论文</h2>
-              <p>无需选择模板。模型会自动整理问题、方法和算法流程，首段生成后立即显示。</p>
+              <p>全文在本机抽取，含图表的页面额外渲染成原图一起送进模型，因此表格数字和曲线也读得到。</p>
             </div>
             <div class="auto-outline" aria-label="自动导读结构">
-              <span>下载并验证 PDF</span>
-              <span>解析全文与图表</span>
+              <span>下载并校验 PDF</span>
+              <span>本地抽全文 + 渲染图表页</span>
               <span>实时生成结构化导读</span>
             </div>
           </section>
@@ -81,7 +84,10 @@
             <div class="composer">
               <textarea id="message-input" rows="1" placeholder="问问关于这篇论文的任何问题" aria-label="输入论文问题"></textarea>
               <div class="composer-actions">
-                <span id="model-badge" class="model-badge">GPT‑5.6 Luna · 无推理</span>
+                <span id="model-badge" class="model-badge">DeepSeek V4 Flash Vision</span>
+                <button id="stop-button" class="stop-button" type="button" aria-label="停止生成" title="停止生成" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+                </button>
                 <button id="send-button" class="send-button" type="button" aria-label="发送" title="发送">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14-7-4.8 14-2.7-5.5L5 12Zm6.5 1.5L19 5"/></svg>
                 </button>
@@ -111,26 +117,14 @@
           <span>访问口令 <em>可选</em></span>
           <input id="access-token" name="accessToken" type="password" autocomplete="off" placeholder="与 READER_ACCESS_TOKEN 一致" />
         </label>
-        <label>
+        <div class="settings-static">
           <span>模型</span>
-          <select id="model-select" name="model">
-            <option value="gpt-5.6-luna">GPT‑5.6 Luna（推荐，更快）</option>
-            <option value="gpt-5.6-terra">GPT‑5.6 Terra（质量与速度平衡）</option>
-            <option value="gpt-5.6">GPT‑5.6 Sol（质量优先）</option>
-          </select>
-        </label>
-        <label>
-          <span>推理强度</span>
-          <select id="reasoning-effort" name="reasoningEffort">
-            <option value="none">无（推荐，最快）</option>
-            <option value="low">低</option>
-            <option value="medium">中</option>
-            <option value="high">高（最慢）</option>
-          </select>
-        </label>
+          <strong id="active-model">deepseek-v4-flash-vision-exp</strong>
+          <em>由本地服务的 READER_MODEL 决定，扩展里不切换。</em>
+        </div>
 
         <div id="connection-result" class="connection-result" hidden></div>
-        <p class="settings-note">OpenAI API Key 只保存在本地服务的环境变量中，不会写进浏览器扩展。</p>
+        <p class="settings-note">DeepSeek API Key 只保存在本地服务的环境变量中，不会写进浏览器扩展。</p>
 
         <div class="dialog-actions">
           <button id="test-connection-button" class="secondary-button" type="button">测试连接</button>
