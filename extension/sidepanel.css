@@ -566,3 +566,43 @@ button { color: inherit; }
   .reader-layout { grid-template-columns: minmax(0, 1fr) 400px; }
   .pdf-brand h1 { max-width: 44vw; }
 }
+
+/* 导读目录：由实际渲染出的 h2 生成，不是模型输出的。 */
+.summary-toc {
+  margin: 0 0 18px;
+  padding: 11px 14px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.summary-toc-caption {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summary-toc ol {
+  margin: 0;
+  padding-left: 19px;
+  font-size: 13px;
+}
+
+.summary-toc li { margin: 2px 0; }
+
+.summary-toc a {
+  color: var(--accent-deep);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.summary-toc a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* 从目录跳过去时，标题别贴着容器顶边 */
+.message-body h2 { scroll-margin-top: 8px; }

@@ -1,6 +1,6 @@
 {
   "name": "codex-paper-reader",
-  "version": "0.7.5",
+  "version": "0.7.7",
   "private": true,
   "type": "module",
   "description": "A local-first Chrome extension that opens a PDF-bound DeepSeek research-paper reader in an independent tab.",

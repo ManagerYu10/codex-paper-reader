@@ -50,7 +50,13 @@ export class FakeElement {
   }
   replaceChildren(...nodes) { this.children = []; this.append(...nodes); }
   removeAttribute(name) { delete this.attributes[name]; if (name in this) this[name] = undefined; }
-  insertAdjacentHTML(_pos, html) { this.innerHTML += html; }
+  // 位置必须照做：afterbegin 插到最前，beforeend 追加。
+  // 以前这里无视 position 一律追加，会让"目录插在正文之前"这类断言假通过。
+  insertAdjacentHTML(position, html) {
+    if (position === "afterbegin") this.innerHTML = html + this.innerHTML;
+    else if (position === "beforeend") this.innerHTML += html;
+    else throw new Error(`未桩接的 insertAdjacentHTML 位置：${position}`);
+  }
   scrollTo(opts) { this.scrollTop = opts?.top ?? 0; }
   scrollIntoView() {}
   click() { return this.dispatch("click", {}); }

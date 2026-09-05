@@ -9,6 +9,7 @@ const javascriptFiles = [
   "extension/background.js",
   "extension/entry.js",
   "extension/markdown.js",
+  "extension/test/markdown.test.js",
   "extension/sidepanel.js",
   "server/server.js",
   "server/pdf-cache.js",
@@ -97,6 +98,29 @@ if (!sidepanelJs.includes("error.status !== 404")) {
   throw new Error("A dropped document cache must re-upload automatically");
 }
 if (!sidepanelHtml.includes('id="file-picker"')) throw new Error("The reader needs a local-PDF fallback");
+// 目录必须从实际写出的标题派生：章节结构跟着论文走，写死一份必然对不上。
+if (!sidepanelJs.includes("sectionTitles") || !sidepanelJs.includes("summary-toc")) {
+  throw new Error("The summary must carry a table of contents derived from its own headings");
+}
+// 大白话必须是引用块：渲染器要支持合并多行，prompt 要求行首的 > 不能省。
+if (!read("extension/markdown.js").includes("closeQuote")) {
+  throw new Error("Consecutive quote lines must merge into one blockquote");
+}
+// prompt 是反引号模板字符串。里面出现裸反引号会提前终止它，而偶数个反引号
+// 还能重新配对成合法但语义错乱的代码——node --check 完全拦不住。
+{
+  const match = sidepanelJs.match(/const AUTO_SUMMARY_PROMPT = `([\s\S]*?)`;\n\nconst DEFAULT_SETTINGS/);
+  if (!match) throw new Error("AUTO_SUMMARY_PROMPT is missing or its delimiters were broken");
+  if (match[1].includes("`")) {
+    throw new Error("AUTO_SUMMARY_PROMPT must not contain a backtick — it silently truncates the template literal");
+  }
+}
+if (!sidepanelJs.includes("必须写成 Markdown 引用")) {
+  throw new Error("The plain-language explanation must be emitted as a blockquote");
+}
+if (!read("extension/sidepanel.css").includes(".summary-toc")) {
+  throw new Error("The table of contents is missing its styles");
+}
 if (!entryJs.includes("pointerdown") || !entryJs.includes("POSITION_KEY")) {
   throw new Error("The floating entry button must be draggable with a remembered position");
 }
@@ -107,7 +131,8 @@ if (!entryJs.includes("论文导读") || !entryJs.includes('a[href*="/pdf/"]')) 
   throw new Error("The arXiv/PDF page entry is missing");
 }
 
-for (const heading of ["## 一句话总结", "## 既有方案的痛点", "## 核心工作", "## 概念与算法流程"]) {
+for (const heading of ["## 一句话总结", "## 既有方案的痛点", "## 核心工作", "## 它是怎么做的",
+                       "## 效果如何", "## 局限与存疑", "## 后续方向"]) {
   if (!sidepanelJs.includes(heading)) throw new Error(`The automatic summary prompt is missing: ${heading}`);
 }
 for (const groundingRule of ["论文未说明", "大白话（直觉解释）", "表格内部不要插入空行"]) {
@@ -125,7 +150,21 @@ for (const readabilityRule of [
   ["一个段落最多附一次", "location anchors must not interrupt every sentence"],
   // 可扫读和可读懂是两件事，两条都要在：只有散文会淹没重点，只有词条会丢掉论证。
   ["要能扫读，也要能读懂", "the summary must stay scannable with bullets, bold and tables"],
-  ["每条 bullet 用加粗开头点题", "bullets must lead with a bold phrase so the eye can land"]
+  ["加粗的第一句就是这一条的论点", "each bullet must open with a bold claim sentence, not a label"],
+  ["每条最多三句", "bullets must stay within three sentences so the summary scans"],
+  // 硬字数会让模型写到一半就收手，留下没写完的阶段。完整性必须压过篇幅。
+  ["写完整比写短重要", "finishing every section must outrank brevity"],
+  ["绝不允许写到一半停下", "the walkthrough must never stop mid-structure"],
+  // 效果那节是唯一该出数字的地方；局限那节必须分清论文自陈和读者推断。
+  ["这一节是全文唯一鼓励给数字的地方", "the results section must be the one place numbers belong"],
+  ["不能伪装成论文结论", "inferred limitations must never be passed off as the paper's own"],
+  ["不要自己发明研究方向", "future work must come from the paper, never invented"],
+  // 章节结构必须跟着论文走。写死模板会把数据引擎、评测基准这类主贡献整章漏掉。
+  ["由这篇论文自己决定，不要套模板", "the walkthrough's subsections must adapt to the paper, not a fixed template"],
+  ["很多论文的贡献根本不在模型结构上", "the prompt must not assume the contribution is a model architecture"],
+  // 图表页原图本来就送进模型了；不指认编号，读者没法照着论文对读。
+  ["如果论文有整体架构图或方法总览图", "the walkthrough must name the paper's main architecture figure"],
+  ["只写你确实看到的编号", "figure numbers must never be invented"]
 ]) {
   if (!sidepanelJs.includes(readabilityRule[0])) {
     throw new Error(`The automatic summary prompt is missing a readability rule: ${readabilityRule[1]}`);

@@ -57,3 +57,23 @@ test("escapes untrusted HTML inside Markdown and tables", () => {
   assert.doesNotMatch(html, /<script>/);
   assert.match(html, /&lt;script&gt;/);
 });
+
+test("连续的引用行合成一个引用块，不会被切成好几个", () => {
+  const html = renderMarkdown("> **大白话（直觉解释）：** 第一句。\n> 第二句接着说。");
+  assert.equal((html.match(/<blockquote>/g) || []).length, 1, "只该有一个引用块");
+  assert.match(html, /<strong>大白话（直觉解释）：<\/strong>/);
+  assert.match(html, /第一句。<br>第二句接着说。/);
+});
+
+test("引用符号后面漏了空格也照样当引用", () => {
+  assert.match(renderMarkdown(">**大白话：** 漏了空格。"), /^<blockquote><strong>大白话：<\/strong>/);
+  // 不该把 > 当成正文漏出来
+  assert.ok(!renderMarkdown(">**大白话：** 漏了空格。").includes("&gt;"));
+});
+
+test("引用块会在遇到普通内容时正确收尾", () => {
+  const html = renderMarkdown("> 引用。\n\n普通段落。\n\n- 列表项");
+  assert.match(html, /<blockquote>引用。<\/blockquote><p>普通段落。<\/p><ul><li>列表项<\/li><\/ul>/);
+  // 引用紧跟标题时也不能把标题吞进去
+  assert.match(renderMarkdown("> 引用。\n## 标题"), /<\/blockquote><h2>标题<\/h2>/);
+});

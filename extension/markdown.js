@@ -1,3 +1,5 @@
+const isQuoteLine = (line) => /^\s*>/.test(line);
+
 export function renderMarkdown(markdown) {
   const codeBlocks = [];
   const text = String(markdown || "").replace(/```(?:\w+)?\n?([\s\S]*?)```/g, (_match, code) => {
@@ -12,9 +14,17 @@ export function renderMarkdown(markdown) {
     if (listType) output.push(`</${listType}>`);
     listType = "";
   };
+  // 连续的引用行要合成一个 blockquote，否则一段大白话会被切成几个断开的引用框。
+  let inQuote = false;
+  const closeQuote = () => {
+    if (inQuote) output.push("</blockquote>");
+    inQuote = false;
+  };
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index].trimEnd();
+    // 一旦离开引用块就把它收掉；判断放在最前，后面每条分支都不用各自操心。
+    if (inQuote && !isQuoteLine(line)) closeQuote();
     const codeMatch = line.match(/^@@CODEBLOCK_(\d+)@@$/);
     if (codeMatch) {
       closeList();
@@ -67,15 +77,23 @@ export function renderMarkdown(markdown) {
       continue;
     }
 
-    if (line.startsWith("> ")) {
-      closeList();
-      output.push(`<blockquote>${inlineMarkdown(line.slice(2))}</blockquote>`);
+    if (isQuoteLine(line)) {
+      if (!inQuote) {
+        closeList();
+        output.push("<blockquote>");
+        inQuote = true;
+      } else {
+        output.push("<br>");
+      }
+      // 模型偶尔会写成 ">大白话" 少一个空格，照样当引用处理
+      output.push(inlineMarkdown(line.replace(/^\s*>\s?/, "")));
       continue;
     }
 
     closeList();
     output.push(`<p>${inlineMarkdown(line)}</p>`);
   }
+  closeQuote();
   closeList();
   return output.join("");
 }

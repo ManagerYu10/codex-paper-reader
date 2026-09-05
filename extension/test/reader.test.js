@@ -243,3 +243,57 @@ test("上一轮生成中断留下的空回答会被丢掉，自动导读重新�
     fake.close();
   }
 });
+
+test("目录只取二级标题，跳过三级、代码块和强调符号", async () => {
+  const dom = installDom({ search: "", storage: {} });
+  const { sectionTitles } = await import(`${READER}?case=${++instance}`);
+  void dom;
+
+  const markdown = [
+    "## 一句话总结", "正文", "",
+    "## 它是怎么做的",
+    "### 整体思路", "### 数据引擎（对应 Figure 5）", "",
+    "```", "## 这行在代码块里，不算", "```", "",
+    "## **效果如何**", "",
+    "##没有空格的不算", "#### 四级也不算"
+  ].join("\n");
+
+  assert.deepEqual(sectionTitles(markdown), ["一句话总结", "它是怎么做的", "效果如何"]);
+  assert.deepEqual(sectionTitles(""), []);
+  assert.deepEqual(sectionTitles(undefined), []);
+});
+
+test("章节够多的导读会自动生成目录，且排在正文最前", async () => {
+  const fake = await startFakeServer({
+    chunks: ["## 一句话总结\n", "一段话。\n\n", "## 它是怎么做的\n", "### 整体思路\n", "细节。\n\n",
+             "## 效果如何\n", "很好。\n"]
+  });
+  try {
+    const dom = await bootReader({ backendUrl: fake.url });
+    await waitForIdle(dom);
+
+    const summary = bodies(dom).at(-1).innerHTML;
+    assert.match(summary, /class="summary-toc"/, "导读应当带目录");
+    // 只在目录那一段里断言——正文里本来就有 <h3>整体思路</h3>
+    const toc = summary.slice(summary.indexOf("summary-toc"), summary.indexOf("</nav>"));
+    assert.match(toc, /目录 · 3 节/);
+    assert.match(toc, /data-section="0"/);
+    assert.match(toc, /一句话总结[\s\S]*它是怎么做的[\s\S]*效果如何/, "三节都要在，且保持原顺序");
+    assert.ok(!toc.includes("整体思路"), "### 不该出现在目录里");
+    // 目录必须排在正文最前面
+    assert.ok(summary.indexOf("summary-toc") < summary.indexOf("<h2"), "目录应当在正文之前");
+  } finally {
+    fake.close();
+  }
+});
+
+test("只有一两节的短回答不加目录", async () => {
+  const fake = await startFakeServer();   // 默认 fixture 只有一个二级标题
+  try {
+    const dom = await bootReader({ backendUrl: fake.url });
+    await waitForIdle(dom);
+    assert.ok(!bodies(dom).at(-1).innerHTML.includes("summary-toc"), "短回答不该有目录");
+  } finally {
+    fake.close();
+  }
+});

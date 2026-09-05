@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "DeepSeek 论文阅读器",
   "description": "从 arXiv 或 PDF 一键打开独立的论文导读网页：本地抽全文 + 图表页原图，DeepSeek 多模态解读。",
-  "version": "0.7.5",
+  "version": "0.7.7",
   "minimum_chrome_version": "116",
   "permissions": [
     "tabs",
