@@ -25,6 +25,18 @@ for (const file of javascriptFiles) {
   execFileSync(process.execPath, ["--check", resolve(root, file)], { stdio: "inherit" });
 }
 
+// 顶层 ZhangYu/AGENTS.md 要求每个独立 Repo 根目录都自带这两个文件：
+// Codex 只从当前 Repo 根开始找 AGENTS.md，不会继续往上读。
+for (const file of ["AGENTS.md", "CLAUDE.md"]) {
+  if (!existsSync(resolve(root, file))) throw new Error(`${file} is missing from the repo root`);
+}
+if (!read("CLAUDE.md").includes("@AGENTS.md")) {
+  throw new Error("CLAUDE.md must import @AGENTS.md instead of restating shared rules");
+}
+if (read("AGENTS.md").includes("CLAUDE.md")) {
+  throw new Error("AGENTS.md must not depend on CLAUDE.md — the dependency only runs one way");
+}
+
 const manifest = JSON.parse(read("extension/manifest.json"));
 if (manifest.manifest_version !== 3) throw new Error("manifest.json must use Manifest V3");
 if (manifest.side_panel) throw new Error("The reader must open as a dedicated tab, not a Side Panel");
